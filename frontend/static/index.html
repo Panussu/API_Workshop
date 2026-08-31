@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image Processing Workshop</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- ส่วนหัวและคำอธิบายการทำงานของ Workshop -->
+  <main class="container">
+    <header>
+      <p class="eyebrow">FASTAPI WORKSHOP</p>
+      <h1>Image Processing Server</h1>
+      <p>เลือกภาพและรูปแบบการประมวลผล จากนั้น Frontend จะส่งภาพไปยัง Backend Server</p>
+    </header>
+
+    <!-- Form สำหรับเลือกไฟล์และ operation ที่จะส่งไปยัง Frontend API -->
+    <form id="upload-form" class="panel">
+      <label for="image-file">ไฟล์ภาพ (JPEG, PNG หรือ WebP ไม่เกิน 10 MB)</label>
+      <input id="image-file" name="file" type="file" accept="image/jpeg,image/png,image/webp" required>
+
+      <label for="operation">รูปแบบการประมวลผล</label>
+      <select id="operation" name="operation">
+        <option value="grayscale">Grayscale - ภาพขาวดำ</option>
+        <option value="blur">Blur - ทำภาพเบลอ</option>
+        <option value="edge">Edge Detection - ตรวจจับขอบ</option>
+        <option value="invert">Invert - กลับค่าสี</option>
+      </select>
+
+      <button id="submit-button" type="submit">ประมวลผลภาพ</button>
+      <p id="status" role="status"></p>
+    </form>
+
+    <!-- ซ่อนส่วนผลลัพธ์ไว้ก่อน และแสดงเมื่อ Server ส่งภาพกลับมาสำเร็จ -->
+    <section id="results" class="results" hidden>
+      <article class="image-card">
+        <h2>ภาพต้นฉบับ</h2>
+        <img id="original-image" alt="ภาพต้นฉบับ">
+      </article>
+      <article class="image-card">
+        <h2>ภาพผลลัพธ์</h2>
+        <img id="processed-image" alt="ภาพหลังประมวลผล">
+        <a id="download-link" download="processed-image.png">ดาวน์โหลดภาพผลลัพธ์</a>
+      </article>
+    </section>
+  </main>
+
+  <!-- JavaScript ควบคุมการส่งภาพและแสดงผลโดยไม่โหลดหน้าเว็บใหม่ -->
+  <script src="/static/app.js"></script>
+</body>
+</html>
