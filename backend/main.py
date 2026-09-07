@@ -1,5 +1,9 @@
 """Backend API สำหรับตรวจสอบ ประมวลผล และส่งภาพ PNG กลับไปยัง Client."""
 
+# ==============================================================================
+# GROUP 1: IMPORTS & DEPENDENCIES
+# ==============================================================================
+
 # BytesIO ทำให้ข้อมูล bytes ใช้งานเหมือนไฟล์ที่อยู่ในหน่วยความจำ
 # จึงไม่จำเป็นต้องสร้างไฟล์ชั่วคราวบนดิสก์ระหว่างประมวลผลภาพ
 from io import BytesIO
@@ -7,21 +11,35 @@ from io import BytesIO
 # FastAPI ใช้สร้างแอปและ route ส่วน File/Form ใช้อ่าน multipart/form-data
 # HTTPException ใช้ตอบข้อผิดพลาดเป็น HTTP status และ UploadFile แทนไฟล์อัปโหลด
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+
 # CORSMiddleware กำหนดว่าเว็บไซต์จาก origin ใดเรียก API ผ่าน Browser ได้
 from fastapi.middleware.cors import CORSMiddleware
+
 # StreamingResponse ส่งข้อมูลภาพจาก buffer กลับไปโดยไม่ต้องบันทึกเป็นไฟล์จริง
 from fastapi.responses import StreamingResponse
+
 # Pillow ให้ชนิด Image, filter สำหรับเบลอ/หาขอบ, utility สำหรับเทา/กลับสี
 # และ exception สำหรับกรณีข้อมูลที่รับมาไม่ใช่ไฟล์ภาพที่ Pillow รู้จัก
 from PIL import Image, ImageFilter, ImageOps, UnidentifiedImageError
 
 
+# ==============================================================================
+# GROUP 2: CONFIGURATION & CONSTANTS
+# ==============================================================================
+
 # จำกัดข้อมูลที่อ่านไว้ที่ 10 MiB (10 × 1024 × 1024 ไบต์)
 MAX_FILE_SIZE = 10 * 1024 * 1024
+
 # MIME type ที่ยอมรับในส่วน file ของ multipart request
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
+
 # ชื่อ operation ที่ Client สามารถขอให้ Backend ทำได้
 OPERATIONS = {"grayscale", "blur", "edge", "invert"}
+
+
+# ==============================================================================
+# GROUP 3: FASTAPI APPLICATION SETUP & CORS MIDDLEWARE
+# ==============================================================================
 
 # สร้าง FastAPI application; metadata ชุดนี้จะแสดงในหน้า /docs และ OpenAPI
 app = FastAPI(
@@ -47,6 +65,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ==============================================================================
+# GROUP 4: CORE IMAGE PROCESSING LOGIC
+# ==============================================================================
 
 def process_image(image: Image.Image, operation: str) -> Image.Image:
     """ประมวลผลภาพตาม operation ที่เลือก แล้วคืน Pillow Image โหมด RGB."""
@@ -74,6 +96,10 @@ def process_image(image: Image.Image, operation: str) -> Image.Image:
     # เป็น guard สำหรับกรณีมีการเรียกฟังก์ชันนี้จากที่อื่นด้วยค่าที่ไม่รองรับ
     raise ValueError(f"Unsupported operation: {operation}")
 
+
+# ==============================================================================
+# GROUP 5: API ENDPOINTS (ROUTES)
+# ==============================================================================
 
 # ผูกฟังก์ชัน health กับคำขอ GET /health
 @app.get("/health")
