@@ -10,10 +10,13 @@ from io import BytesIO
 # FastAPI ใช้สร้างแอปและ route ส่วน File/Form ใช้อ่าน multipart/form-data
 # HTTPException ใช้ตอบข้อผิดพลาดเป็น HTTP status และ UploadFile แทนไฟล์อัปโหลด
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+
 # CORSMiddleware กำหนดว่าเว็บไซต์จาก origin ใดเรียก API ผ่าน Browser ได้
 from fastapi.middleware.cors import CORSMiddleware
+
 # StreamingResponse ส่งข้อมูลภาพจาก buffer กลับไปโดยไม่ต้องบันทึกเป็นไฟล์จริง
 from fastapi.responses import StreamingResponse
+
 # Pillow ให้ชนิด Image, filter สำหรับเบลอ/หาขอบ, utility สำหรับเทา/กลับสี
 # และ exception สำหรับกรณีข้อมูลที่รับมาไม่ใช่ไฟล์ภาพที่ Pillow รู้จัก
 from PIL import Image, ImageFilter, ImageOps, UnidentifiedImageError
@@ -24,8 +27,10 @@ from PIL import Image, ImageFilter, ImageOps, UnidentifiedImageError
 
 # จำกัดข้อมูลที่อ่านไว้ที่ 10 MiB (10 × 1024 × 1024 ไบต์)
 MAX_FILE_SIZE = 10 * 1024 * 1024
+
 # MIME type ที่ยอมรับในส่วน file ของ multipart request
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
+
 # ชื่อ operation ที่ Client สามารถขอให้ Backend ทำได้
 OPERATIONS = {"grayscale", "blur", "edge", "invert"}
 

@@ -5,16 +5,20 @@
 
 # os ใช้อ่านค่า configuration จาก environment variable
 import os
+
 # Path ใช้สร้างตำแหน่งไฟล์ static แบบที่ทำงานได้ข้ามระบบปฏิบัติการ
 from pathlib import Path
 
 # httpx เป็น HTTP client ที่ Frontend ใช้ส่งไฟล์ต่อไปยัง Backend
 import httpx
+
 # FastAPI ใช้สร้างแอป; File/Form/UploadFile ใช้รับ multipart form จาก Browser
 # HTTPException ใช้แจ้งกรณี Frontend ติดต่อ Backend ไม่ได้
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+
 # FileResponse ใช้ส่ง index.html ส่วน Response ใช้ส่ง body/status ของ Backend ต่อ
 from fastapi.responses import FileResponse, Response
+
 # StaticFiles ทำให้ Browser ขอไฟล์ CSS และ JavaScript ในโฟลเดอร์ static ได้
 from fastapi.staticfiles import StaticFiles
 
@@ -24,6 +28,7 @@ from fastapi.staticfiles import StaticFiles
 
 # หา absolute path ของโฟลเดอร์ frontend โดยอิงตำแหน่งไฟล์นี้
 BASE_DIR = Path(__file__).resolve().parent
+
 # ใช้ URL จาก environment เมื่อตั้งไว้ หรือชี้ไปพอร์ต 8001 บนเครื่องเดียวกัน
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8001")
 
@@ -39,6 +44,7 @@ app = FastAPI(
     # เวอร์ชันของ API นี้
     version="1.0.0",
 )
+
 # URL ที่ขึ้นต้นด้วย /static จะอ่านไฟล์จาก frontend/static
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
