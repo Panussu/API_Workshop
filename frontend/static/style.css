@@ -1,3 +1,6 @@
+/* ==================== ส่วนที่ 1: Global และค่าพื้นฐาน ==================== */
+/* กำหนดสี ฟอนต์ box model และพื้นหลังร่วมของหน้าเว็บ */
+
 /* :root คือ element รากของเอกสาร ใช้กำหนดค่าพื้นฐานที่ element ลูกสืบทอดได้ */
 :root {
   /* บอก Browser ว่าหน้านี้ออกแบบสำหรับชุดสีสว่าง รวมถึง native controls */
@@ -22,6 +25,9 @@ body {
   /* ไล่สีพื้นหลัง 3 ช่วงตามแนว 145 องศา */
   background: linear-gradient(145deg, #e8f3ff 0%, #f7f9fc 48%, #e9fff7 100%);
 }
+
+/* ==================== ส่วนที่ 2: Page Layout และ Header ==================== */
+/* จัดความกว้างของเนื้อหาให้อยู่กึ่งกลางและตกแต่งส่วนหัวของหน้า */
 
 /* ครอบเนื้อหาทั้งหมดเพื่อจำกัดความกว้างและจัดกึ่งกลาง */
 .container {
@@ -54,6 +60,9 @@ header { margin-bottom: 28px; }
 h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.5rem); }
 /* เลือกย่อหน้าตัวสุดท้ายที่เป็นลูกโดยตรงของ header */
 header > p:last-child { max-width: 680px; color: #566176; }
+
+/* ==================== ส่วนที่ 3: Panel และ Form Controls ==================== */
+/* ตกแต่งกล่อง form, card, label, input และ select ให้ใช้รูปแบบเดียวกัน */
 
 /* ใช้รูปลักษณ์กล่องร่วมกันระหว่าง form panel กับ image card */
 .panel, .image-card {
@@ -94,6 +103,9 @@ input, select, button {
   font: inherit;
 }
 
+/* ==================== ส่วนที่ 4: Button และ Status ==================== */
+/* กำหนดรูปลักษณ์ปุ่มและสีข้อความตามสถานะของ request */
+
 /* ปรับปุ่มให้เป็น call-to-action สีเขียว */
 button {
   margin-top: 8px;
@@ -116,6 +128,9 @@ button:disabled { opacity: 0.65; cursor: wait; }
 .loading { color: #8a5a00; }
 .success { color: #087f5b; }
 .error { color: #c92a2a; }
+
+/* ==================== ส่วนที่ 5: Results และ Image Cards ==================== */
+/* จัดวางภาพต้นฉบับ ภาพผลลัพธ์ และลิงก์ดาวน์โหลด */
 
 /* กล่องรวมภาพต้นฉบับและภาพผลลัพธ์ */
 .results {
@@ -151,6 +166,9 @@ button:disabled { opacity: 0.65; cursor: wait; }
   color: #087f5b;
   font-weight: 700;
 }
+
+/* ==================== ส่วนที่ 6: Responsive Layout ==================== */
+/* ปรับหน้าเว็บให้เหมาะกับโทรศัพท์และหน้าจอที่มีความกว้างไม่เกิน 700px */
 
 /* กฎ responsive จะทำงานเมื่อ viewport กว้างไม่เกิน 700px */
 @media (max-width: 700px) {

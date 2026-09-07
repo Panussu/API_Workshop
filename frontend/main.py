@@ -1,5 +1,8 @@
 """Frontend FastAPI สำหรับเสิร์ฟหน้าเว็บและทำหน้าที่ proxy ไปยัง Backend."""
 
+# ==================== ส่วนที่ 1: Imports และ Dependencies ====================
+# รวมเครื่องมือสำหรับอ่าน configuration, เสิร์ฟไฟล์ และเรียก Backend ผ่าน HTTP
+
 # os ใช้อ่านค่า configuration จาก environment variable
 import os
 # Path ใช้สร้างตำแหน่งไฟล์ static แบบที่ทำงานได้ข้ามระบบปฏิบัติการ
@@ -16,10 +19,16 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 
+# ==================== ส่วนที่ 2: Configuration ====================
+# ระบุตำแหน่งไฟล์หน้าเว็บและ URL ของ Backend ที่ Frontend จะเชื่อมต่อ
+
 # หา absolute path ของโฟลเดอร์ frontend โดยอิงตำแหน่งไฟล์นี้
 BASE_DIR = Path(__file__).resolve().parent
 # ใช้ URL จาก environment เมื่อตั้งไว้ หรือชี้ไปพอร์ต 8001 บนเครื่องเดียวกัน
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8001")
+
+# ==================== ส่วนที่ 3: การสร้าง FastAPI และ Static Files ====================
+# สร้างแอป Frontend และเปิดให้ Browser โหลด HTML, CSS และ JavaScript
 
 # สร้าง Frontend application; metadata จะแสดงใน /docs และ OpenAPI
 app = FastAPI(
@@ -34,6 +43,10 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 
+# ==================== ส่วนที่ 4: Page และ Health Endpoints ====================
+# Endpoint กลุ่มนี้ใช้ส่งหน้าเว็บและรายงานสถานะของ Frontend
+
+# ---------- 4.1 หน้าเว็บหลัก ----------
 # ผูกหน้าแรกของเว็บไซต์เข้ากับ GET /
 @app.get("/", response_class=FileResponse)
 async def index() -> FileResponse:
@@ -43,6 +56,7 @@ async def index() -> FileResponse:
     return FileResponse(BASE_DIR / "static" / "index.html")
 
 
+# ---------- 4.2 Health Check ----------
 # Endpoint สำหรับระบบ monitoring ตรวจสอบว่า Frontend ยังตอบสนอง
 @app.get("/health")
 async def health() -> dict[str, str]:
@@ -51,6 +65,9 @@ async def health() -> dict[str, str]:
     # Dictionary จะถูก FastAPI serialize เป็น JSON
     return {"status": "ok", "service": "image-processing-frontend"}
 
+
+# ==================== ส่วนที่ 5: Backend Proxy Endpoint ====================
+# รับไฟล์จาก Browser ส่งต่อไป Backend และนำ response เดิมกลับมาให้ Browser
 
 # Browser ส่ง form มาที่ path นี้แทนการเรียก Backend โดยตรง
 @app.post("/api/process")
