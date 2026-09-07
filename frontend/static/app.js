@@ -1,58 +1,83 @@
-// เลือก element จากหน้า HTML เพื่อใช้รับข้อมูลและแสดงผล
+// querySelector คืน element แรกที่ตรงกับ CSS selector ที่ระบุ
+// script ถูกโหลดท้าย body จึงมั่นใจได้ว่า element เหล่านี้ถูกสร้างแล้ว
+// form เป็นจุดที่ใช้ดักเหตุการณ์ submit
 const form = document.querySelector("#upload-form");
+// fileInput ใช้อ่าน FileList ที่ผู้ใช้เลือก
 const fileInput = document.querySelector("#image-file");
+// statusText แสดงสถานะ loading, success หรือ error
 const statusText = document.querySelector("#status");
+// submitButton ถูก disable ระหว่างรอ response เพื่อป้องกันการส่งซ้ำ
 const submitButton = document.querySelector("#submit-button");
+// results คือ section ที่ซ่อนอยู่จนกว่าจะได้รับภาพสำเร็จ
 const results = document.querySelector("#results");
+// image element สำหรับ preview ไฟล์ต้นฉบับ
 const originalImage = document.querySelector("#original-image");
+// image element สำหรับ PNG ที่ผ่านการประมวลผล
 const processedImage = document.querySelector("#processed-image");
+// anchor ที่จะชี้ไปยัง Object URL ของผลลัพธ์เพื่อดาวน์โหลด
 const downloadLink = document.querySelector("#download-link");
 
+// เก็บ Object URL ล่าสุดไว้นอก callback เพื่อให้ยกเลิกก่อนสร้างรอบใหม่ได้
 let originalUrl;
 let processedUrl;
 
-// ทำงานเมื่อผู้ใช้กดปุ่ม "ประมวลผลภาพ"
+// callback นี้ทำงานเมื่อผู้ใช้ submit form เช่นกดปุ่ม "ประมวลผลภาพ"
 form.addEventListener("submit", async (event) => {
-  // ป้องกัน Browser โหลดหน้าเว็บใหม่หลัง submit form
+  // ยกเลิกพฤติกรรมปกติของ form ที่จะนำทาง/โหลดหน้าใหม่
   event.preventDefault();
+  // FileList ใช้ index 0 เพราะ input นี้ไม่ได้เปิดให้เลือกหลายไฟล์
   const file = fileInput.files[0];
+  // ป้องกันกรณี callback ถูกเรียกโดยไม่มีไฟล์ แม้ HTML จะมี required อยู่แล้ว
   if (!file) return;
 
+  // ล็อกปุ่มจนกว่า request รอบนี้จะสิ้นสุด
   submitButton.disabled = true;
+  // className เชื่อมกับสี .loading ใน CSS
   statusText.className = "loading";
   statusText.textContent = "กำลังส่งภาพไปประมวลผล...";
 
+  // ครอบขั้นตอน network และแปลง response เพื่อแสดง error ที่เข้าใจง่าย
   try {
-    // FormData จะรวมไฟล์ภาพและ operation แล้วส่งไปยัง FastAPI Frontend
+    // สร้าง multipart/form-data จาก control ทุกตัวที่มี name อยู่ใน form
+    // จึงได้ field "file" และ "operation" ตรงกับ parameter ของ FastAPI
     const formData = new FormData(form);
+    // ไม่กำหนด Content-Type เอง เพราะ Browser ต้องเติม multipart boundary ให้ถูกต้อง
     const response = await fetch("/api/process", { method: "POST", body: formData });
 
+    // fetch ไม่ throw เมื่อได้ HTTP 4xx/5xx จึงต้องตรวจ response.ok เอง
     if (!response.ok) {
+      // FastAPI ส่ง error เป็น JSON; ถ้า body ไม่ใช่ JSON ให้ fallback เป็น object ว่าง
       const error = await response.json().catch(() => ({}));
+      // ใช้ detail จาก Server หรือข้อความทั่วไปเมื่อไม่มีรายละเอียด
       throw new Error(error.detail || "ประมวลผลภาพไม่สำเร็จ");
     }
 
-    // รับภาพ PNG ที่ Server ส่งกลับมาในรูปแบบ Blob
+    // แปลง response body ของภาพ PNG เป็น Blob ที่ Browser ใช้งานได้
     const resultBlob = await response.blob();
-    // ยกเลิก URL เก่าก่อนสร้าง URL ใหม่ เพื่อไม่ให้ใช้หน่วยความจำค้างไว้
+    // Object URL อ้างหน่วยความจำไว้ จึงยกเลิก URL รอบก่อนก่อนสร้างค่าใหม่
     if (originalUrl) URL.revokeObjectURL(originalUrl);
     if (processedUrl) URL.revokeObjectURL(processedUrl);
 
+    // สร้าง URL ชั่วคราวสำหรับ preview ไฟล์ต้นฉบับจากเครื่องผู้ใช้
     originalUrl = URL.createObjectURL(file);
+    // สร้าง URL ชั่วคราวสำหรับ Blob ผลลัพธ์จาก Server
     processedUrl = URL.createObjectURL(resultBlob);
-    // แสดงภาพต้นฉบับ ภาพผลลัพธ์ และกำหนดลิงก์ดาวน์โหลด
+    // กำหนด src ของภาพทั้งสองให้ Browser แสดง Object URL
     originalImage.src = originalUrl;
     processedImage.src = processedUrl;
+    // ใช้ Blob เดียวกับภาพผลลัพธ์เป็นไฟล์ปลายทางของลิงก์ดาวน์โหลด
     downloadLink.href = processedUrl;
+    // เปลี่ยน hidden property เพื่อแสดง section ผลลัพธ์
     results.hidden = false;
+    // เปลี่ยนสีและข้อความสถานะเมื่อทุกขั้นตอนสำเร็จ
     statusText.className = "success";
     statusText.textContent = "ประมวลผลเสร็จแล้ว";
   } catch (error) {
-    // แสดงข้อความเมื่อ Backend ไม่พร้อม หรือไฟล์ไม่ผ่านการตรวจสอบ
+    // ครอบคลุม network error, JSON/Blob error และ Error ที่โยนจาก HTTP status
     statusText.className = "error";
     statusText.textContent = error.message;
   } finally {
-    // เปิดปุ่มให้กดใหม่ได้ ไม่ว่าคำขอจะสำเร็จหรือเกิดข้อผิดพลาด
+    // finally ทำงานเสมอ จึงเปิดปุ่มได้ทั้งกรณีสำเร็จและผิดพลาด
     submitButton.disabled = false;
   }
 });

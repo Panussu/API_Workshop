@@ -1,52 +1,75 @@
 <!doctype html>
+<!-- ระบุภาษาหลักเป็นไทย เพื่อช่วย Browser, Search Engine และ Screen Reader -->
 <html lang="th">
 <head>
+  <!-- ใช้ UTF-8 เพื่อให้ตัวอักษรภาษาไทยแสดงผลถูกต้อง -->
   <meta charset="utf-8">
+  <!-- ให้ความกว้างหน้าเว็บอิงตามอุปกรณ์จริง เพื่อรองรับหน้าจอมือถือ -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- ข้อความที่แสดงบนชื่อแท็บของ Browser -->
   <title>Image Processing Workshop</title>
+  <!-- โหลด style sheet ที่ Frontend FastAPI ให้บริการผ่าน path /static -->
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <!-- ส่วนหัวและคำอธิบายการทำงานของ Workshop -->
+  <!-- main คือเนื้อหาหลักของหน้า และ container จำกัดความกว้าง/จัดกึ่งกลางด้วย CSS -->
   <main class="container">
+    <!-- ส่วนหัวและคำอธิบายการทำงานของ Workshop -->
     <header>
+      <!-- eyebrow เป็นข้อความกำกับขนาดเล็กเหนือหัวข้อหลัก -->
       <p class="eyebrow">FASTAPI WORKSHOP</p>
+      <!-- h1 เป็นหัวข้อหลักของหน้าเว็บ -->
       <h1>Image Processing Server</h1>
+      <!-- อธิบายเส้นทางข้อมูลแบบสั้นให้ผู้ใช้ทราบ -->
       <p>เลือกภาพและรูปแบบการประมวลผล จากนั้น Frontend จะส่งภาพไปยัง Backend Server</p>
     </header>
 
-    <!-- Form สำหรับเลือกไฟล์และ operation ที่จะส่งไปยัง Frontend API -->
+    <!-- JavaScript ดัก submit ของ Form นี้แล้วส่งไปยัง POST /api/process -->
     <form id="upload-form" class="panel">
+      <!-- for เชื่อม label นี้กับ input ที่มี id="image-file" -->
       <label for="image-file">ไฟล์ภาพ (JPEG, PNG หรือ WebP ไม่เกิน 10 MB)</label>
+      <!-- accept ช่วยกรองชนิดไฟล์ในหน้าต่างเลือกไฟล์ ส่วน required บังคับให้เลือกไฟล์ -->
+      <!-- การตรวจสอบด้านความปลอดภัยจริงยังต้องทำซ้ำที่ Backend -->
       <input id="image-file" name="file" type="file" accept="image/jpeg,image/png,image/webp" required>
 
+      <!-- label ของ dropdown สำหรับเลือกวิธีประมวลผล -->
       <label for="operation">รูปแบบการประมวลผล</label>
+      <!-- name="operation" ทำให้ FormData ใช้ชื่อนี้เป็น form field -->
       <select id="operation" name="operation">
+        <!-- value คือข้อความจริงที่ส่งให้ Python ไม่ใช่ข้อความทั้งหมดที่ผู้ใช้เห็น -->
         <option value="grayscale">Grayscale - ภาพขาวดำ</option>
         <option value="blur">Blur - ทำภาพเบลอ</option>
         <option value="edge">Edge Detection - ตรวจจับขอบ</option>
         <option value="invert">Invert - กลับค่าสี</option>
       </select>
 
+      <!-- type="submit" ทำให้การกดปุ่มเรียก submit event ของ form -->
       <button id="submit-button" type="submit">ประมวลผลภาพ</button>
+      <!-- JavaScript ใส่ข้อความกำลังทำงาน/สำเร็จ/ผิดพลาดใน element นี้ -->
+      <!-- role="status" ช่วยให้ Screen Reader ประกาศข้อความที่เปลี่ยนแปลง -->
       <p id="status" role="status"></p>
     </form>
 
-    <!-- ซ่อนส่วนผลลัพธ์ไว้ก่อน และแสดงเมื่อ Server ส่งภาพกลับมาสำเร็จ -->
+    <!-- hidden ซ่อนผลลัพธ์ในตอนแรก; JavaScript จะตั้ง hidden=false เมื่อสำเร็จ -->
     <section id="results" class="results" hidden>
+      <!-- Card ด้านซ้ายใช้แสดงไฟล์ที่ผู้ใช้เลือกโดยไม่ต้องส่งกลับจาก Server -->
       <article class="image-card">
         <h2>ภาพต้นฉบับ</h2>
+        <!-- ยังไม่มี src เพราะ JavaScript จะสร้าง Object URL จากไฟล์แล้วกำหนดให้ -->
         <img id="original-image" alt="ภาพต้นฉบับ">
       </article>
+      <!-- Card ด้านขวาใช้แสดง PNG ที่ Backend ประมวลผลแล้ว -->
       <article class="image-card">
         <h2>ภาพผลลัพธ์</h2>
+        <!-- src จะถูกกำหนดจาก Blob ที่ได้จาก fetch response -->
         <img id="processed-image" alt="ภาพหลังประมวลผล">
+        <!-- href จะถูก JavaScript กำหนด; download แนะนำชื่อไฟล์เมื่อบันทึก -->
         <a id="download-link" download="processed-image.png">ดาวน์โหลดภาพผลลัพธ์</a>
       </article>
     </section>
   </main>
 
-  <!-- JavaScript ควบคุมการส่งภาพและแสดงผลโดยไม่โหลดหน้าเว็บใหม่ -->
+  <!-- วาง script ท้าย body เพื่อให้ HTML element ด้านบนถูกสร้างก่อน JavaScript ทำงาน -->
   <script src="/static/app.js"></script>
 </body>
 </html>
