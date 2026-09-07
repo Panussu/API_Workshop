@@ -1,108 +1,163 @@
+/* :root คือ element รากของเอกสาร ใช้กำหนดค่าพื้นฐานที่ element ลูกสืบทอดได้ */
 :root {
+  /* บอก Browser ว่าหน้านี้ออกแบบสำหรับชุดสีสว่าง รวมถึง native controls */
   color-scheme: light;
+  /* ใช้ Segoe UI ก่อน ถ้าไม่มีจึงลอง Tahoma และ sans-serif ของระบบ */
   font-family: "Segoe UI", Tahoma, sans-serif;
+  /* สีข้อความเริ่มต้นที่ element ส่วนใหญ่จะสืบทอด */
   color: #172033;
+  /* สีพื้นฐานของพื้นที่ราก; body จะวาด gradient ทับอีกชั้น */
   background: #edf3f8;
 }
 
-/* กำหนดให้ขนาด element รวม padding และ border เพื่อจัด layout ได้ง่าย */
+/* เลือกทุก element และรวม padding/border เข้าไปในการคำนวณ width/height */
 * { box-sizing: border-box; }
 
+/* กำหนดพื้นที่หลักที่มองเห็นของหน้าเว็บ */
 body {
+  /* ลบขอบว่างเริ่มต้นที่ Browser ใส่ให้ body */
   margin: 0;
+  /* ทำให้พื้นหลังสูงอย่างน้อยเต็มความสูง viewport แม้เนื้อหาจะสั้น */
   min-height: 100vh;
+  /* ไล่สีพื้นหลัง 3 ช่วงตามแนว 145 องศา */
   background: linear-gradient(145deg, #e8f3ff 0%, #f7f9fc 48%, #e9fff7 100%);
 }
 
+/* ครอบเนื้อหาทั้งหมดเพื่อจำกัดความกว้างและจัดกึ่งกลาง */
 .container {
+  /* เลือกค่าที่เล็กกว่า: 1050px หรือความกว้างหน้าจอลบขอบรวม 32px */
   width: min(1050px, calc(100% - 32px));
+  /* 0 คือไม่มี margin บน/ล่าง ส่วน auto จัดซ้าย/ขวาให้อยู่กึ่งกลาง */
   margin: 0 auto;
+  /* เพิ่มพื้นที่ว่างบนและล่างของหน้า */
   padding: 56px 0;
 }
 
+/* แยกส่วนหัวออกจาก form ด้านล่าง */
 header { margin-bottom: 28px; }
 
+/* ข้อความกำกับเล็กเหนือ h1 */
 .eyebrow {
+  /* ไม่มี margin ด้านบน/ข้าง และเว้นด้านล่าง 8px */
   margin: 0 0 8px;
+  /* สีเขียวเดียวกับสีหลักของปุ่ม */
   color: #087f5b;
+  /* rem อิงขนาดฟอนต์ของ root element */
   font-size: 0.78rem;
+  /* ตัวหนาระดับ 800 */
   font-weight: 800;
+  /* เพิ่มช่องไฟระหว่างตัวอักษรเพื่อให้ดูเหมือน label */
   letter-spacing: 0.16em;
 }
 
+/* clamp ทำให้ h1 ย่อ/ขยายตาม viewport แต่ไม่ต่ำกว่า 2rem หรือเกิน 3.5rem */
 h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.5rem); }
+/* เลือกย่อหน้าตัวสุดท้ายที่เป็นลูกโดยตรงของ header */
 header > p:last-child { max-width: 680px; color: #566176; }
 
-/* รูปแบบกล่องหลักสำหรับ Form และภาพผลลัพธ์ */
+/* ใช้รูปลักษณ์กล่องร่วมกันระหว่าง form panel กับ image card */
 .panel, .image-card {
+  /* เส้นขอบสีเข้มที่โปร่งมาก เพื่อแยกกล่องออกจากพื้นหลัง */
   border: 1px solid rgba(23, 32, 51, 0.08);
+  /* ทำมุมกล่องให้โค้ง */
   border-radius: 18px;
+  /* พื้นหลังขาวโปร่งเล็กน้อยเพื่อให้ยังรับรู้ gradient ด้านหลัง */
   background: rgba(255, 255, 255, 0.88);
+  /* เงานุ่มด้านล่างของกล่อง */
   box-shadow: 0 18px 48px rgba(34, 61, 87, 0.1);
 }
 
+/* จัดสมาชิกของ form เป็นแถวแนวตั้งด้วย CSS Grid */
 .panel {
   display: grid;
+  /* ระยะระหว่าง label, control และ status */
   gap: 12px;
+  /* พื้นที่ว่างภายในกล่อง */
   padding: 24px;
 }
 
+/* ทำข้อความกำกับ input/select ให้เด่น */
 label { font-weight: 700; }
+/* กฎพื้นฐานร่วมของช่องเลือกไฟล์, dropdown และปุ่ม */
 input, select, button {
+  /* ขยายเต็มความกว้างของ panel */
   width: 100%;
+  /* ความสูงขั้นต่ำช่วยให้กดบนหน้าจอสัมผัสได้ง่าย */
   min-height: 46px;
+  /* เส้นขอบของ form control */
   border: 1px solid #c8d2df;
+  /* มุมโค้งเล็กกว่ากล่องหลัก */
   border-radius: 10px;
+  /* พื้นที่ระหว่างเนื้อหากับขอบ control */
   padding: 10px 12px;
+  /* ใช้รูปแบบฟอนต์เดียวกับ parent แทนค่าเริ่มต้นของ Browser */
   font: inherit;
 }
 
+/* ปรับปุ่มให้เป็น call-to-action สีเขียว */
 button {
   margin-top: 8px;
+  /* ลบ border ที่กำหนดจากกฎร่วมด้านบน */
   border: 0;
   color: white;
   background: #087f5b;
   font-weight: 800;
+  /* รูปมือสื่อว่าปุ่มกดได้ */
   cursor: pointer;
 }
+/* เปลี่ยนสีเมื่อเมาส์ชี้ เพื่อให้ feedback ว่าปุ่มโต้ตอบได้ */
 button:hover { background: #066b4d; }
+/* ระหว่างส่ง request ปุ่มจะจางและ cursor แสดงสถานะรอ */
 button:disabled { opacity: 0.65; cursor: wait; }
 
+/* จองความสูงไว้แม้ยังไม่มีข้อความ เพื่อป้องกัน layout ขยับ */
 #status { min-height: 24px; margin: 0; }
+/* JavaScript สลับ class สามตัวนี้ตามสถานะของ request */
 .loading { color: #8a5a00; }
 .success { color: #087f5b; }
 .error { color: #c92a2a; }
 
-/* แสดงภาพต้นฉบับและภาพผลลัพธ์แบบสองคอลัมน์ */
+/* กล่องรวมภาพต้นฉบับและภาพผลลัพธ์ */
 .results {
   display: grid;
+  /* สร้างสองคอลัมน์ขนาดเท่ากัน และ minmax(0, ...) ช่วยป้องกัน content ดัน grid */
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
   margin-top: 24px;
 }
 
+/* บังคับซ่อน section ในช่วงก่อนมีผลลัพธ์ แม้ .results จะกำหนด display:grid */
 .results[hidden] { display: none; }
+/* เพิ่มพื้นที่ภายใน card */
 .image-card { padding: 18px; }
+/* ลดช่องว่างเหนือหัวข้อและกำหนดขนาดหัวข้อในการ์ด */
 .image-card h2 { margin-top: 0; font-size: 1.15rem; }
+/* รูปทั้งสองใช้พื้นที่แสดงผลขนาดเดียวกัน */
 .image-card img {
   display: block;
   width: 100%;
   height: 360px;
   border-radius: 12px;
   background: #e8edf2;
+  /* แสดงภาพครบโดยไม่ crop; อาจมีพื้นที่ว่างเมื่อสัดส่วนภาพไม่ตรงกับกรอบ */
   object-fit: contain;
 }
 
+/* รูปแบบลิงก์สำหรับบันทึก PNG */
 #download-link {
+  /* inline-block ทำให้ margin-top มีผลชัดเจน */
   display: inline-block;
   margin-top: 14px;
   color: #087f5b;
   font-weight: 700;
 }
 
-/* บนหน้าจอขนาดเล็กให้เปลี่ยนเป็นหนึ่งคอลัมน์ */
+/* กฎ responsive จะทำงานเมื่อ viewport กว้างไม่เกิน 700px */
 @media (max-width: 700px) {
+  /* ลดพื้นที่ว่างแนวตั้งบนจอเล็ก */
   .container { padding: 32px 0; }
+  /* วางภาพต้นฉบับและผลลัพธ์ต่อกันในคอลัมน์เดียว */
   .results { grid-template-columns: 1fr; }
+  /* ลดความสูงกรอบภาพให้เหมาะกับโทรศัพท์ */
   .image-card img { height: 280px; }
 }
