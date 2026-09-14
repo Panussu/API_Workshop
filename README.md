@@ -1,8 +1,8 @@
 # Image Processing Workshop with FastAPI
 
-โปรเจกต์นี้แบ่งเป็น 2 Service ซึ่งสามารถรันคนละเครื่องได้
+โปรเจกต์นี้ประกอบด้วยหน้าเว็บแบบ Static และ Backend API ซึ่งสามารถอยู่คนละเครื่องได้
 
-- **Frontend** รับไฟล์จากผู้ใช้ แสดงภาพต้นฉบับ และส่งคำขอไปยัง Backend
+- **Frontend** เป็น HTML/CSS/JavaScript ล้วน รับไฟล์จากผู้ใช้และเรียก Backend โดยตรง
 - **Backend** รับไฟล์ภาพ ประมวลผลด้วย Pillow และส่งภาพ PNG กลับมา
 
 รองรับการประมวลผล 4 แบบ: Grayscale, Blur, Edge Detection และ Invert
@@ -10,9 +10,8 @@
 ## การไหลของข้อมูล
 
 ```text
-Web Browser -> Frontend FastAPI (port 8000)
-            -> Backend FastAPI  (port 8001)
-            -> Frontend -> Web Browser
+frontend/static/index.html -> Backend FastAPI (port 8001)
+                           -> Web Browser
 ```
 
 ## ติดตั้ง
@@ -25,41 +24,28 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-## รันบนเครื่องเดียวกัน
-
-เปิด PowerShell หน้าต่างที่ 1 สำหรับ Backend
+## รัน Backend
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 python -m uvicorn backend.main:app --host 0.0.0.0 --port 8001
 ```
 
-เปิด PowerShell หน้าต่างที่ 2 สำหรับ Frontend
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-python -m uvicorn frontend.main:app --host 0.0.0.0 --port 8000
-```
-
-จากนั้นเปิด <http://127.0.0.1:8000>
+จากนั้นเปิดไฟล์ `frontend/static/index.html` ด้วย Browser ไม่ต้องรัน Python สำหรับ Frontend
+โดย URL ของ Backend กำหนดไว้ใน `frontend/static/app.js`
 
 เอกสาร API ของ Backend อยู่ที่ <http://127.0.0.1:8001/docs>
 
-## รัน Frontend และ Backend คนละเครื่อง
+## ใช้ Frontend และ Backend คนละเครื่อง
 
 1. รัน Backend ด้วย `--host 0.0.0.0` บนเครื่อง Server และเปิด TCP port 8001 ใน Firewall
 2. หา IP ของเครื่อง Backend เช่น `192.168.1.20`
-3. ก่อนรัน Frontend ให้กำหนด URL ของ Backend
-
-```powershell
-$env:BACKEND_URL = "http://192.168.1.20:8001"
-python -m uvicorn frontend.main:app --host 0.0.0.0 --port 8000
-```
-
-4. Client เปิด `http://<FRONTEND-IP>:8000` ผ่าน Browser
+3. คัดลอกโฟลเดอร์ `frontend/static` ไปยังเครื่อง Frontend
+4. กำหนด `BACKEND_URL` ใน `app.js` ให้เป็น IP ของเครื่อง Backend แล้วเปิด `index.html` ด้วย Browser
+5. หาก Browser ขอสิทธิ์เข้าถึงอุปกรณ์ในเครือข่ายภายใน ให้กดอนุญาต
 
 ## ทดสอบ
 
 ```powershell
-python -m pytest -q
+python -m pytest tests -q
 ```

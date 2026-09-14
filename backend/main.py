@@ -1,5 +1,8 @@
 """Backend API สำหรับตรวจสอบ ประมวลผล และส่งภาพ PNG กลับไปยัง Client."""
 
+# ==================== ส่วนที่ 1: Imports และ Dependencies ====================
+# รวมเครื่องมือสำหรับรับ HTTP request, จัดการไฟล์ในหน่วยความจำ และประมวลผลภาพ
+
 # BytesIO ทำให้ข้อมูล bytes ใช้งานเหมือนไฟล์ที่อยู่ในหน่วยความจำ
 # จึงไม่จำเป็นต้องสร้างไฟล์ชั่วคราวบนดิสก์ระหว่างประมวลผลภาพ
 from io import BytesIO
@@ -7,21 +10,32 @@ from io import BytesIO
 # FastAPI ใช้สร้างแอปและ route ส่วน File/Form ใช้อ่าน multipart/form-data
 # HTTPException ใช้ตอบข้อผิดพลาดเป็น HTTP status และ UploadFile แทนไฟล์อัปโหลด
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+
 # CORSMiddleware กำหนดว่าเว็บไซต์จาก origin ใดเรียก API ผ่าน Browser ได้
 from fastapi.middleware.cors import CORSMiddleware
+
 # StreamingResponse ส่งข้อมูลภาพจาก buffer กลับไปโดยไม่ต้องบันทึกเป็นไฟล์จริง
 from fastapi.responses import StreamingResponse
+
 # Pillow ให้ชนิด Image, filter สำหรับเบลอ/หาขอบ, utility สำหรับเทา/กลับสี
 # และ exception สำหรับกรณีข้อมูลที่รับมาไม่ใช่ไฟล์ภาพที่ Pillow รู้จัก
 from PIL import Image, ImageFilter, ImageOps, UnidentifiedImageError
 
 
+# ==================== ส่วนที่ 2: Configuration และข้อจำกัด ====================
+# กำหนดขนาดไฟล์ ชนิดไฟล์ และ operation ที่ Backend อนุญาต
+
 # จำกัดข้อมูลที่อ่านไว้ที่ 10 MiB (10 × 1024 × 1024 ไบต์)
 MAX_FILE_SIZE = 10 * 1024 * 1024
+
 # MIME type ที่ยอมรับในส่วน file ของ multipart request
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
+
 # ชื่อ operation ที่ Client สามารถขอให้ Backend ทำได้
 OPERATIONS = {"grayscale", "blur", "edge", "invert"}
+
+# ==================== ส่วนที่ 3: การสร้าง FastAPI Application ====================
+# สร้างตัวแอปหลักและกำหนดข้อมูลที่ใช้ในหน้าเอกสาร API
 
 # สร้าง FastAPI application; metadata ชุดนี้จะแสดงในหน้า /docs และ OpenAPI
 app = FastAPI(
@@ -33,12 +47,31 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# ==================== ส่วนที่ 4: CORS Middleware ====================
+app = FastAPI(
+    # ชื่อ service ในเอกสาร API
+    title="Image Processing Backend",
+    # คำอธิบายหน้าที่ของ service
+    description="รับไฟล์ภาพ ประมวลผล และส่งภาพผลลัพธ์กลับไปให้ Client",
+    # เวอร์ชัน API ไม่ใช่เวอร์ชันของ FastAPI
+    version="1.0.0",
+)
+
+# ==================== ส่วนที่ 4: CORS Middleware ====================
+# กำหนดสิทธิ์การเรียก Backend จากหน้าเว็บที่อยู่คนละ origin
+
 # เพิ่ม CORS middleware เผื่อ JavaScript จาก Frontend เรียก Backend โดยตรง
 app.add_middleware(
     # เลือก middleware ที่จะติดตั้งใน request/response pipeline
     CORSMiddleware,
-    # อนุญาตเฉพาะหน้าเว็บที่เปิดจาก Frontend พอร์ต 8000 บนเครื่องเดียวกัน
-    allow_origins=["http://127.0.0.1:8000", "http://localhost:8000"],
+    # อนุญาตหน้าเว็บที่เปิดจาก Frontend พอร์ต 8000 ทั้ง localhost และ IP ของเครื่อง
+    allow_origins=[
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+        "http://172.20.57.133:8000",
+        # Browser ใช้ Origin: null เมื่อเปิด frontend/static/index.html แบบ file://
+        "null",
+    ],
     # อนุญาต credential เช่น cookie ใน cross-origin request
     allow_credentials=True,
     # Cross-origin request ใช้ได้เฉพาะ GET และ POST
@@ -47,6 +80,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# ==================== ส่วนที่ 5: Image Processing Logic ====================
+# ฟังก์ชันหลักส่วนนี้ไม่เกี่ยวกับ HTTP โดยตรง รับ Pillow Image แล้วคืนภาพที่แก้ไขแล้ว
 
 def process_image(image: Image.Image, operation: str) -> Image.Image:
     """ประมวลผลภาพตาม operation ที่เลือก แล้วคืน Pillow Image โหมด RGB."""
@@ -75,6 +111,10 @@ def process_image(image: Image.Image, operation: str) -> Image.Image:
     raise ValueError(f"Unsupported operation: {operation}")
 
 
+# ==================== ส่วนที่ 6: API Endpoints ====================
+# รวม URL ที่ Client สามารถเรียกใช้จาก Backend
+
+# ---------- 6.1 Health Check Endpoint ----------
 # ผูกฟังก์ชัน health กับคำขอ GET /health
 @app.get("/health")
 async def health() -> dict[str, str]:
@@ -84,6 +124,7 @@ async def health() -> dict[str, str]:
     return {"status": "ok", "service": "image-processing-backend"}
 
 
+# ---------- 6.2 Image Processing Endpoint ----------
 # ผูกฟังก์ชันด้านล่างกับคำขอ POST /process
 @app.post(
     # URL path สำหรับรับภาพ

@@ -1,6 +1,8 @@
 <!doctype html>
 <!-- ระบุภาษาหลักเป็นไทย เพื่อช่วย Browser, Search Engine และ Screen Reader -->
 <html lang="th">
+<!-- ==================== ส่วนที่ 1: Document Metadata ==================== -->
+<!-- กำหนด encoding, viewport, ชื่อแท็บ และไฟล์ CSS ที่หน้าเว็บต้องใช้ -->
 <head>
   <!-- ใช้ UTF-8 เพื่อให้ตัวอักษรภาษาไทยแสดงผลถูกต้อง -->
   <meta charset="utf-8">
@@ -8,12 +10,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- ข้อความที่แสดงบนชื่อแท็บของ Browser -->
   <title>Image Processing Workshop</title>
-  <!-- โหลด style sheet ที่ Frontend FastAPI ให้บริการผ่าน path /static -->
-  <link rel="stylesheet" href="/static/style.css">
+  <!-- ใช้ relative path เพื่อให้เปิดไฟล์ index.html จากเครื่องได้โดยตรง -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+  <!-- ==================== ส่วนที่ 2: Main Page Content ==================== -->
+  <!-- เนื้อหาที่ผู้ใช้มองเห็นทั้งหมดอยู่ภายใน main -->
   <!-- main คือเนื้อหาหลักของหน้า และ container จำกัดความกว้าง/จัดกึ่งกลางด้วย CSS -->
   <main class="container">
+    <!-- ---------- 2.1 ส่วนหัวของหน้า ---------- -->
     <!-- ส่วนหัวและคำอธิบายการทำงานของ Workshop -->
     <header>
       <!-- eyebrow เป็นข้อความกำกับขนาดเล็กเหนือหัวข้อหลัก -->
@@ -24,7 +29,8 @@
       <p>เลือกภาพและรูปแบบการประมวลผล จากนั้น Frontend จะส่งภาพไปยัง Backend Server</p>
     </header>
 
-    <!-- JavaScript ดัก submit ของ Form นี้แล้วส่งไปยัง POST /api/process -->
+    <!-- ---------- 2.2 Form อัปโหลดและตัวเลือกการประมวลผล ---------- -->
+    <!-- JavaScript ดัก submit ของ Form นี้แล้วส่งตรงไปยัง Backend API -->
     <form id="upload-form" class="panel">
       <!-- for เชื่อม label นี้กับ input ที่มี id="image-file" -->
       <label for="image-file">ไฟล์ภาพ (JPEG, PNG หรือ WebP ไม่เกิน 10 MB)</label>
@@ -50,6 +56,7 @@
       <p id="status" role="status"></p>
     </form>
 
+    <!-- ---------- 2.3 พื้นที่แสดงภาพต้นฉบับและภาพผลลัพธ์ ---------- -->
     <!-- hidden ซ่อนผลลัพธ์ในตอนแรก; JavaScript จะตั้ง hidden=false เมื่อสำเร็จ -->
     <section id="results" class="results" hidden>
       <!-- Card ด้านซ้ายใช้แสดงไฟล์ที่ผู้ใช้เลือกโดยไม่ต้องส่งกลับจาก Server -->
@@ -69,7 +76,9 @@
     </section>
   </main>
 
+  <!-- ==================== ส่วนที่ 3: JavaScript ==================== -->
+  <!-- โหลด logic หลังเนื้อหาหลัก เพื่อควบคุม form และการแสดงผลภาพ -->
   <!-- วาง script ท้าย body เพื่อให้ HTML element ด้านบนถูกสร้างก่อน JavaScript ทำงาน -->
-  <script src="/static/app.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
