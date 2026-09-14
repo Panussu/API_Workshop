@@ -48,14 +48,30 @@ app = FastAPI(
 )
 
 # ==================== ส่วนที่ 4: CORS Middleware ====================
+app = FastAPI(
+    # ชื่อ service ในเอกสาร API
+    title="Image Processing Backend",
+    # คำอธิบายหน้าที่ของ service
+    description="รับไฟล์ภาพ ประมวลผล และส่งภาพผลลัพธ์กลับไปให้ Client",
+    # เวอร์ชัน API ไม่ใช่เวอร์ชันของ FastAPI
+    version="1.0.0",
+)
+
+# ==================== ส่วนที่ 4: CORS Middleware ====================
 # กำหนดสิทธิ์การเรียก Backend จากหน้าเว็บที่อยู่คนละ origin
 
 # เพิ่ม CORS middleware เผื่อ JavaScript จาก Frontend เรียก Backend โดยตรง
 app.add_middleware(
     # เลือก middleware ที่จะติดตั้งใน request/response pipeline
     CORSMiddleware,
-    # อนุญาตเฉพาะหน้าเว็บที่เปิดจาก Frontend พอร์ต 8000 บนเครื่องเดียวกัน
-    allow_origins=["http://127.0.0.1:8000", "http://localhost:8000"],
+    # อนุญาตหน้าเว็บที่เปิดจาก Frontend พอร์ต 8000 ทั้ง localhost และ IP ของเครื่อง
+    allow_origins=[
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+        "http://172.20.57.133:8000",
+        # Browser ใช้ Origin: null เมื่อเปิด frontend/static/index.html แบบ file://
+        "null",
+    ],
     # อนุญาต credential เช่น cookie ใน cross-origin request
     allow_credentials=True,
     # Cross-origin request ใช้ได้เฉพาะ GET และ POST

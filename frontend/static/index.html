@@ -10,8 +10,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- ข้อความที่แสดงบนชื่อแท็บของ Browser -->
   <title>Image Processing Workshop</title>
-  <!-- โหลด style sheet ที่ Frontend FastAPI ให้บริการผ่าน path /static -->
-  <link rel="stylesheet" href="/static/style.css">
+  <!-- ใช้ relative path เพื่อให้เปิดไฟล์ index.html จากเครื่องได้โดยตรง -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <!-- ==================== ส่วนที่ 2: Main Page Content ==================== -->
@@ -30,7 +30,7 @@
     </header>
 
     <!-- ---------- 2.2 Form อัปโหลดและตัวเลือกการประมวลผล ---------- -->
-    <!-- JavaScript ดัก submit ของ Form นี้แล้วส่งไปยัง POST /api/process -->
+    <!-- JavaScript ดัก submit ของ Form นี้แล้วส่งตรงไปยัง Backend API -->
     <form id="upload-form" class="panel">
       <!-- for เชื่อม label นี้กับ input ที่มี id="image-file" -->
       <label for="image-file">ไฟล์ภาพ (JPEG, PNG หรือ WebP ไม่เกิน 10 MB)</label>
@@ -79,6 +79,6 @@
   <!-- ==================== ส่วนที่ 3: JavaScript ==================== -->
   <!-- โหลด logic หลังเนื้อหาหลัก เพื่อควบคุม form และการแสดงผลภาพ -->
   <!-- วาง script ท้าย body เพื่อให้ HTML element ด้านบนถูกสร้างก่อน JavaScript ทำงาน -->
-  <script src="/static/app.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>

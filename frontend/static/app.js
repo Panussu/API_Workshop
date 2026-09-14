@@ -5,6 +5,8 @@
 // script ถูกโหลดท้าย body จึงมั่นใจได้ว่า element เหล่านี้ถูกสร้างแล้ว
 // form เป็นจุดที่ใช้ดักเหตุการณ์ submit
 const form = document.querySelector("#upload-form");
+// URL ของ Backend ถูกกำหนดภายในโค้ด จึงไม่ต้องแสดงช่องตั้งค่าบนหน้าเว็บ
+const BACKEND_URL = "http://172.20.57.133:8001";
 // fileInput ใช้อ่าน FileList ที่ผู้ใช้เลือก
 const fileInput = document.querySelector("#image-file");
 // statusText แสดงสถานะ loading, success หรือ error
@@ -53,7 +55,10 @@ form.addEventListener("submit", async (event) => {
     // จึงได้ field "file" และ "operation" ตรงกับ parameter ของ FastAPI
     const formData = new FormData(form);
     // ไม่กำหนด Content-Type เอง เพราะ Browser ต้องเติม multipart boundary ให้ถูกต้อง
-    const response = await fetch("/api/process", { method: "POST", body: formData });
+    const response = await fetch(`${BACKEND_URL}/process`, {
+      method: "POST",
+      body: formData,
+    });
 
     // fetch ไม่ throw เมื่อได้ HTTP 4xx/5xx จึงต้องตรวจ response.ok เอง
     if (!response.ok) {
@@ -88,7 +93,10 @@ form.addEventListener("submit", async (event) => {
   } catch (error) {
     // ครอบคลุม network error, JSON/Blob error และ Error ที่โยนจาก HTTP status
     statusText.className = "error";
-    statusText.textContent = error.message;
+    statusText.textContent =
+      error instanceof TypeError
+        ? "เชื่อมต่อ Backend ไม่ได้ กรุณาตรวจสอบ URL, เครือข่าย และ Firewall"
+        : error.message;
   } finally {
     // finally ทำงานเสมอ จึงเปิดปุ่มได้ทั้งกรณีสำเร็จและผิดพลาด
     submitButton.disabled = false;
